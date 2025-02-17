@@ -6,6 +6,7 @@
 // @author       Arman JR.
 // @match        https://www.linkedin.com/jobs/*
 // @grant        none
+// @license MIT
 // ==/UserScript==
 
 (function() {
@@ -13,16 +14,16 @@
 
     const skillsHighlight = {
         'strong': {
-            color: '#0fe800',
+            color: '#0fe800', // green
             skills: ['go', 'golang', 'java', 'spring', 'springboot']
         },
         'intermediate': {
-            color: '#f5ed00',
+            color: '#f5ed00', // yellow
             skills: ['javascript', 'mysql', 'api', 'shell', 'unix']
         },
         'weak': {
-            color: '#ff7f6b',
-            skills: ['typescript', 'ts']
+            color: '#ff7f6b', // red
+            skills: ['typescript']
         }
     };
 
