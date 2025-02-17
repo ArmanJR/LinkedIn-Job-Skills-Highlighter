@@ -4,6 +4,8 @@ A Tampermonkey script that automatically highlights specific keywords across web
 - "java" in green
 - "typescript" in red
 
+https://github.com/ArmanJR/LinkedIn-Job-Skills-Highlighter/blob/main/demo.mp4
+
 ## Installation
 
 1. Install a userscript manager extension (like [Tampermonkey](https://www.tampermonkey.net/))
