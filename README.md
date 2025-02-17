@@ -1,8 +1,6 @@
 # LinkedIn Job Skills Highlighter
 
-A Tampermonkey script that automatically highlights specific keywords across web pages. Currently configured to highlight:
-- "java" in green
-- "typescript" in red
+A Tampermonkey script that automatically highlights your keywords across LinkedIn job descriptions.
 
 https://github.com/user-attachments/assets/2cf29b46-a802-49d8-bc14-d776561d36cc
 
