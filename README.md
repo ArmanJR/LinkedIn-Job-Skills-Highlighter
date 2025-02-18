@@ -23,7 +23,6 @@ After installing the script:
 
 ```
 This is a Tampermonkey script that highlights keywords on LinkedIn jobs. Based on my attached resume and my skills, modify the code's skillsHighlight 'strong' and 'intermediate' objects.
-Escape special characters on skill names, for example ['c++', 'c#', '.net'] should be ['c\\+\\+', 'c\\#', '\\.net'].
 DO NOT change or add any 'weak' skills. Do NOT add any skill not mentioned in the resume. DO NOT change any other part of the code.
 Re-write the full script with changes applied.
 
@@ -34,9 +33,6 @@ Script:
 
 7. Copy the generated code into the Tampermonkey script, and save
 8. Refresh LinkedIn
-
-> [!IMPORTANT]  
-> When typing the skills, please escape special characters like: `['npm', 'c\\+\\+', 'c\\#', '\\.net', 'ios', 'android']`
 
 ## Features
 
