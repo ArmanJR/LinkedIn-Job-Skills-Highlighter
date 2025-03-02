@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         LinkedIn Job Skills Highlighter
 // @namespace    http://github.com/ArmanJR
-// @version      1.2
+// @version      1.3
 // @description  Highlight skills in LinkedIn job postings with color groups
 // @author       Arman JR.
 // @match        https://www.linkedin.com/jobs/*
@@ -27,94 +27,110 @@
         }
     };
  
-    let highlightCount = 0;
-    let highlightInterval = null;
- 
-    function clickShowMoreButton() {
-        const showMoreButton = document.querySelector('.feed-shared-inline-show-more-text__see-more-less-toggle');
-        if (showMoreButton && showMoreButton.textContent.includes('show more')) {
-            console.log('Found "Show more" button, clicking it...');
-            showMoreButton.click();
- 
-            clearInterval(showMoreInterval);
-            console.log('Starting keyword highlighting...');
-            highlightInterval = setInterval(scanJobDescription, 2000);
+    let lastURL = location.href;
+
+    // Wait for element to appear
+    function waitFor(selector, timeout = 10000) {
+        return new Promise((resolve, reject) => {
+            const interval = 200;
+            let elapsed = 0;
+
+            const checkExist = setInterval(() => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    clearInterval(checkExist);
+                    resolve(element);
+                }
+                elapsed += interval;
+                if (elapsed >= timeout) {
+                    clearInterval(checkExist);
+                    reject(`Timeout: ${selector} not found`);
+                }
+            }, interval);
+        });
+    }
+
+    // Click "Show more" if available
+    async function clickShowMore() {
+        console.log('Fired clickShowMore');
+        try {
+            const showMoreBtn = await waitFor('.feed-shared-inline-show-more-text__see-more-less-toggle', 1000);
+            if (showMoreBtn.textContent.toLowerCase().includes('show more')) {
+                console.log('Clicking "Show more" button');
+                showMoreBtn.click();
+            }
+        } catch (e) {
+            console.log('No "Show more" button found or timeout reached.');
         }
     }
- 
-    function scanJobDescription() {
-        const contentDiv = document.querySelector('.feed-shared-inline-show-more-text');
+
+    // Highlight skills in job description
+    function highlightSkills() {
+        console.log('Fired highlightSkills()');
+
+        const contentDiv = document.querySelector('#job-details');
         if (!contentDiv) {
-            console.log('Content div not found, waiting...');
+            console.log('Job description not found yet.');
             return;
         }
- 
-        // Skip if content is already processed
-        if (contentDiv.getAttribute('data-processed')) {
-            return;
-        }
- 
-        highlightCount = 0;
- 
-        // Get all text nodes within the content div
-        const walker = document.createTreeWalker(
-            contentDiv,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
- 
+
+        //if (contentDiv.getAttribute('data-processed')) {
+        //    console.log('Already processed, skipping.');
+        //    return;
+        //}
+
+        const walker = document.createTreeWalker(contentDiv, NodeFilter.SHOW_TEXT, null, false);
         const textNodes = [];
         let node;
-        while (node = walker.nextNode()) {
+
+        while ((node = walker.nextNode())) {
             textNodes.push(node);
         }
- 
-        // Process each text node separately
+
+        let highlightCount = 0;
         textNodes.forEach(textNode => {
-            let content = textNode.textContent;
+            let text = textNode.textContent;
             let modified = false;
- 
-            for (const [level, group] of Object.entries(skillsHighlight)) {
-                for (const skill of group.skills) {
-                    const regex = new RegExp(`(^|\\W)${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=\\W|$)`, 'gi');
-                    const matches = content.match(regex);
- 
-                    if (matches) {
-                        highlightCount += matches.length;
-                        content = content.replace(
-                            regex,
-                            `<span style="background-color: ${group.color}; padding: 0 2px; border-radius: 2px; font-size: 1.1em; font-weight: 500;">$&</span>`
-                        );
+
+            for (const group of Object.values(skillsHighlight)) {
+                group.skills.forEach(skill => {
+                    const regex = new RegExp(`(^|\\W)(${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?=\\W|$)`, 'gi');
+                    if (regex.test(text)) {
                         modified = true;
+                        highlightCount++;
+                        text = text.replace(regex, `$1<span style="background-color:${group.color};padding:0 2px;border-radius:2px;font-size:1.1em;font-weight:500;">$2</span>`);
                     }
-                }
+                });
             }
- 
+
             if (modified) {
                 const span = document.createElement('span');
-                span.innerHTML = content;
+                span.innerHTML = text;
                 textNode.parentNode.replaceChild(span, textNode);
             }
         });
- 
+
         contentDiv.setAttribute('data-processed', 'true');
-        console.log(`Highlighted ${highlightCount} keywords in job description`);
+        console.log(`Highlighted ${highlightCount} skills.`);
     }
- 
-    // Start looking for the "show more" button
-    const showMoreInterval = setInterval(clickShowMoreButton, 1000);
- 
-    // Reset when URL changes (new job selected)
-    let lastUrl = location.href;
-    new MutationObserver(() => {
-        if (location.href !== lastUrl) {
-            lastUrl = location.href;
-            if (highlightInterval) {
-                clearInterval(highlightInterval);
-                highlightInterval = null;
+
+    async function processJobDescription() {
+        await clickShowMore();
+        highlightSkills();
+    }
+
+    // Observe URL changes (LinkedIn dynamically loads content without page reloads)
+    function observeUrlChanges() {
+        new MutationObserver(() => {
+            if (location.href !== lastURL) {
+                lastURL = location.href;
+                console.log('Detected URL change, processing new job...');
+                setTimeout(processJobDescription, 100); // Slight delay to allow content to load
             }
-            const showMoreInterval = setInterval(clickShowMoreButton, 1000);
-        }
-    }).observe(document, {subtree: true, childList: true});
+        }).observe(document.body, { childList: true, subtree: true });
+    }
+
+    // Initial Run
+    processJobDescription();
+    observeUrlChanges();
 })();
