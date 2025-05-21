@@ -8,7 +8,7 @@ https://github.com/user-attachments/assets/2cf29b46-a802-49d8-bc14-d776561d36cc
 
 1. Install a user script manager extension (like [Tampermonkey](https://www.tampermonkey.net/))
 2. Visit [LinkedIn Job Skills Highlighter](https://greasyfork.org/en/scripts/527243-linkedin-job-skills-highlighter)
-3. Click `Install` button
+3. Click the `Install` button
 
 ### Skills Customization
 
@@ -28,18 +28,21 @@ Re-write the full script with changes applied.
 
 Script:
 
-[paste code from step 3 here]
+[Paste code from step 3 here]
 ```
 
 7. Copy the generated code into the Tampermonkey script, and save
 8. Refresh LinkedIn
+
+> [!IMPORTANT]
+> Please note that for the extension to work, you must open a LinkedIn Jobs page (`https://www.linkedin.com/jobs/collections/...`) and then **reload** the page.
 
 ## Features
 
 - Case-insensitive keyword matching
 - Works with dynamic content loading
 - Customizable keywords and colors
-- Initially configured for LinkedIn but can be modified for any website
+- Initially configured for LinkedIn, but can be modified for any website
 
 ## License
 
